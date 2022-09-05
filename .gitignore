@@ -1,0 +1,7 @@
+*temp*
+scratchpad.*
+_*
+.DS_Store
+.clasp.json
+node_modules*
+.claspignore
