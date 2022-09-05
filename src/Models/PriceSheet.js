@@ -1,4 +1,3 @@
-//const config = connect().getSheetByName("Config");
 function definePriceSheetTables() {
   return {
     pricesheet: {
@@ -30,12 +29,7 @@ function createPriceSheet(name) {
   const psSchema = ps.schema
   const ex = defineSubmissionTables().exhibits
   const exSchema = ex.schema
-/*   const e = getCFETables().exhibits
-  const psSource = connect(CFE_ID).getSheetByName(e.name) */
   const data = getSubmissionsById(getShowIdByName(name));
-/*   let imageId = data[0][DataColMap.fileId-1];
-  let imageFormula = `=IMAGE("https://drive.google.com/uc?export=download&id=${imageId}",1)` */
-
 
   if (name) {
     name = name + " Price Sheet"

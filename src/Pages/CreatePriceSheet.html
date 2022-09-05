@@ -84,8 +84,6 @@
                 loading.style.display = "block"
                 google.script.run.withSuccessHandler(priceSheetCreated).createPriceSheet(showName);                
             }
-
-            //console.log(showName)
         } 
 
         function priceSheetCreated() {

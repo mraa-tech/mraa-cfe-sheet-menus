@@ -14,7 +14,7 @@
 </head>
 
 <body>
-    <div class="container">
+    <div class="mx-2">
         <form id="frmMain" class="mt-3">
             <div class="form-group">
                 <label for="exhibitName">Exhibit Name *</label>
@@ -23,23 +23,23 @@
 
             <div class="form-group">
                 <label for="startDate">Start Date</label>
-                <input type="datetime-local" class="form-control" id="startDate" />
+                <input type="date" class="form-control" id="startDate" />
             </div>
 
             <div class="form-group">
-                <label class="form-check-label" for="closeDate">Close Date</label>
-                <input type="datetime-local" class="form-control" id="closeDate" />
+                <label for="closeDate">Close Date</label>
+                <input type="date" class="form-control" id="closeDate" />
             </div>
 
             <div class="row align-items-start form-group">
                 <div class="col">
-                    <label for="maxEntriesPerArtist">Entries per Artist</label>
-                    <input type="number" class="form-control" id="maxEntriesPerArtist" min=1 />
+                    <label for="maxEntriesPerArtist">Entries per Artist (1-4)</label>
+                    <input type="number" class="form-control" id="maxEntriesPerArtist" min="1" max="4" />
                 </div>
 
                 <div class="col">
                     <label for="maxEntriesPerShow">Entries per Show</label>
-                    <input type="number" class="form-control" id="maxEntriesPerShow" min=1/>
+                    <input type="number" class="form-control" id="maxEntriesPerShow" min="1"/>
                 </div>
             </div>
 
@@ -62,12 +62,12 @@
             if (allFieldsValid()) {
                 // show id is generated on server side
                 newShow.exhibitName = document.getElementById("exhibitName").value
-                newShow.startDate = document.getElementById("startDate").value.replace('T', ' ')
-                newShow.closeDate = document.getElementById("closeDate").value.replace('T', ' ')
+                newShow.startDate = document.getElementById("startDate").value
+                newShow.closeDate = document.getElementById("closeDate").value
                 newShow.maxEntriesPerArtist = document.getElementById("maxEntriesPerArtist").value
                 newShow.maxEntriesPerShow = document.getElementById("maxEntriesPerShow").value
                 newShow.entryFee = document.getElementById("entryFee").value
-
+                
                 google.script.run.withSuccessHandler(formSubmitted).addShowToSheet(newShow)
             } else {
                 return false;

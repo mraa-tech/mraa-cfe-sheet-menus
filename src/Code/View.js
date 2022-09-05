@@ -4,7 +4,6 @@
  * @param {eventObject} e event
  */
 function onOpen(e) {
-    console.log(e);
     SpreadsheetApp.getUi()
     .createMenu('MRAA')
     .addItem('Create a New Show', 'createShowForm')
