@@ -184,7 +184,7 @@ function defineSubmissionTables() {
     const startRow = e.headers + 1
     const startCol = schema.eventtitle.colToIndex() + 1
     const data = sheet
-      .getRange(startRow, startCol, sheet.getLastRow() - startRow, 1)
+      .getRange(startRow, startCol, sheet.getLastRow() - e.headers, 1)
       .getDisplayValues()
   
     const filteredData = data.map((d) => d[0])
@@ -211,7 +211,7 @@ function getSubmissionsById(id) {
             startRow,
             schema.eventid.colToIndex() + 1,
             sheet.getLastRow() - 1,
-            schema.fileid.colToIndex()
+            schema.fileid.colToIndex() + 1
         )
         .getValues()
     data = data.filter((d) => d[0] === id);

@@ -20,7 +20,7 @@ function getCFETables() {
         showclosedate: "m",
         entryfee: "n",
         registrationlink: "o",
-        applicationVersion: "p"
+        registrationlinkversion: "p"
       },
     },
     appsettings: {
@@ -29,17 +29,20 @@ function getCFETables() {
       headers: 1,
       schema: {
         maximagesize: "a2",
-        cfecontact: "d2",
-        latestdeploymenturl: "b2",
-        applicationversion: "c2"
+        cfecontact: "b2",
+        statuslist: "c2:c",
+        latestdeploymenturl: "d2",
+        applicationversion: "e2",
+        latestdeploymentlist: "d2:d",
+        applicationversionlist: "e2:e"
       },
     },
   };
 }
 
-
+/* 
 const config = connect().getSheetByName("Config");
-const appSettings = connect().getSheetByName("AppSettings");
+const appSettings = connect().getSheetByName("AppSettings"); */
 
 // Defines the structure of the config array
 /* const Config = {
@@ -93,25 +96,22 @@ const ASLatestUrlVersion = "c2"; */
  *
  * @returns {string} application url
  */
-function getLastestUrl() {
-  return appSettings.getRange(ASLatestUrl).getDisplayValue();
-}
-
-/**
- * Get the version number for the latest application deployment
- *
- * @returns {numeric} application version
- */
-function getLastestUrlVersion() {
-  return appSettings.getRange(ASLatestUrlVersion).getDisplayValue();
-}
+/* function getLastestDeploymentUrl() {
+  const as = getCFETables().appsettings
+  const sheet = connect(CFE_ID).getSheetByName(as.name)
+  const range = as.schema.latestdeploymenturl
+  const data = sheet
+    .getRange(range)
+    .getDisplayValue()
+  return data
+} */
 
 /**
  * Retrieve a show from the Config tab
  * @param {string} id Unique show identifier
  * @returns {object} Show object
  */
-function getShow(id) {
+/* function getShow(id) {
   let data = config
     .getRange(2, 1, config.getLastRow() - 1, config.getLastColumn())
     .getDisplayValues();
@@ -133,22 +133,22 @@ function getShow(id) {
     }
   }
   return show;
-}
+} */
 
 /**
  *
  * @param {string} id Unique show identifier
  * @returns {string} Show name
  */
-function getShowName(id) {
+/* function getShowName(id) {
   return getShow(id).name;
-}
+} */
 
 /**
  * Get all current show identifiers
  * @returns {array} All unique show identifiers
  */
-function getAllShowIds() {
+/* function getAllShowIds() {
   let shows = new Array();
   let allShows = config
     .getRange(2, 1, config.getLastRow() - 1, 1)
@@ -157,54 +157,54 @@ function getAllShowIds() {
   shows = allShows.map((s) => s[0]);
 
   return shows;
-}
+} */
 
 /**
  * Get maximum entries allowed for a show
  * @param {string} id Unique show identifier
  * @returns {number} Max entries
  */
-function getMaxEntriesPerShow(id) {
+/* function getMaxEntriesPerShow(id) {
   let max = 0;
   let maxEntriesPerShow = getShow(id).maxEntriesPerShow;
   if (maxEntriesPerShow) {
     max = maxEntriesPerShow;
   }
   return max;
-}
+} */
 
 /**
  * Get maximum entries allowed per artist
  * @param {string} id Unique show identifier
  * @returns {number} Max artist entries
  */
-function getMaxEntriesPerArtist(id) {
+/* function getMaxEntriesPerArtist(id) {
   let max = getShow(id).maxEntriesPerArtist;
   return max;
-}
+} */
 
 /**
  * Get Pay Fee Only setting for requested show
  * @param {string} id Unique show identifier
  * @returns {boolean} yes/no
  */
-function getPayFeeOnly(id) {
+/* function getPayFeeOnly(id) {
   let pfo = getShow(id).payFeeOnly;
   return pfo;
-}
+} */
 
 /**
  * Get a list of all open shows
  * @returns {array} a list of all open shows
  */
-function getAllOpenShows() {
+/* function getAllOpenShows() {
   let data = config
     .getRange(2, 1, config.getLastRow() - 1, config.getLastColumn())
     .getDisplayValues();
   let openShows = data.filter((d) => d[Config.status] === "OPEN");
 
   return openShows;
-}
+} */
 
 /**
  *
@@ -214,12 +214,40 @@ function getAllOpenShows() {
  * Called by PriceSheet
  */
 function getShowIdByName(name) {
-  let data = config
-    .getRange(2, 1, config.getLastRow() - 1, config.getLastColumn())
+  const c = getCFETables().config
+  const sheet = connect(CFE_ID).getSheetByName(c.name)
+  const data = sheet
+    .getRange(2, 1, sheet.getLastRow() - 1, sheet.getLastColumn())
     .getDisplayValues();
-  let showId = data.filter((d) => d[1] === name);
+  const showId = data.filter((d) => d[1] === name);
 
   return showId[0][0];
+}
+
+function buildStatusValidation() {
+  const as = getCFETables().appsettings
+  const schema = as.schema
+  const sheet = connect(CFE_ID).getSheetByName(as.name)
+  const statusList = sheet.getRange(schema.statuslist)
+  const rule = SpreadsheetApp
+    .newDataValidation()
+    .requireValueInRange(statusList, true)
+    .build()
+  
+  return rule
+}
+
+function getStatusList() {
+  const as = getCFETables().appsettings
+  const schema = as.schema
+  const sheet = connect(CFE_ID).getSheetByName(as.name)
+  const data = sheet
+    .getRange(schema.statuslist)
+    .getDisplayValues()
+
+  // remove rows with an empty column value
+  const list = data.filter(item => item[0] !== "")
+  return list
 }
 
 /**
@@ -231,13 +259,14 @@ function getShowIdByName(name) {
  */
 function addShowToSheet(show) {
     const c = getCFETables().config
+    const as = getCFETables().appsettings
     const sheet = connect(CFE_ID).getSheetByName(c.name)
     const schema = c.schema
-    //let latestAppUrl = getLastestUrl() // TODO: create function
-    //let latestAppVer = getLastestUrlVersion() // TODO: create function
-    let latestAppVer = "=AppSettings!$c$2" 
-    let lastRow = sheet.getLastRow() + 1
-    let latestAppUrl = `=concat(AppSettings!$b$3,a${lastRow})`
+    const asSchema = as.schema
+    const latestAppVer = `=${as.name}!${asSchema.applicationversion}`
+    const lastRow = sheet.getLastRow() + 1
+    const latestAppUrl = `=concat(${as.name}!${asSchema.latestdeploymenturl},a${lastRow})`
+
     let row = []
     row[schema.showid.colToIndex()] = generateUniqueId().toString()
     row[schema.exhibitname.colToIndex()] = show.exhibitName
@@ -246,8 +275,17 @@ function addShowToSheet(show) {
     row[schema.maxentriesperartist.colToIndex()] = show.maxEntriesPerArtist
     row[schema.maxentriespershow.colToIndex()] = show.maxEntriesPerShow
     row[schema.imagefolderid.colToIndex()] = createImageFolder(show.exhibitName)
+    row[schema.registrationlink.colToIndex()] = latestAppUrl
+    row[schema.registrationlinkversion.colToIndex()] = latestAppVer
+    row[schema.entryfee.colToIndex()] = show.entryFee 
 
     sheet.appendRow(row)
-    sheet.getRange("c2:d").setNumberFormat("MM/dd/yyyy h:mm am/pm")
+    sheet
+      .getRange("c2:d")
+      .setNumberFormat("MM/dd/yyyy h:mm am/pm")
+    sheet
+      .getRange(schema.status + sheet.getLastRow())
+      .setDataValidation(buildStatusValidation())
+      .setValue(getStatusList()[0]) // assumption is that first value is the default value
     return row
 }
