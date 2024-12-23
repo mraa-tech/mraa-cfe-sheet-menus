@@ -11,3 +11,5 @@ https://developer.paypal.com/docs/checkout/integrate/
 https://developer.paypal.com/docs/business/javascript-sdk/javascript-sdk-configuration/
 
 Attached to spreadsheet - Call For Entries
+
+This repository was moved to MRAA-Tech organization on GitHub.
